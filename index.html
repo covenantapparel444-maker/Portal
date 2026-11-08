@@ -160,8 +160,32 @@
   .sound[aria-pressed="true"] .on { display: inline; }
   .sound[aria-pressed="true"] .off { display: none; }
 
+  /* ================= Easter egg: ARCHIVE 01 ================= */
+  .hero .scene { -webkit-user-select: none; user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  .egg { position: fixed; inset: 0; z-index: 250; display: flex; align-items: center; justify-content: center;
+    padding: 24px; background: rgba(0,0,0,.35); opacity: 0; transition: opacity .6s var(--ease); }
+  .egg[hidden] { display: none; }
+  .egg.open { opacity: 1; }
+  .egg-panel {
+    position: relative; overflow: hidden; width: 100%; max-width: 560px; padding: 44px 40px 40px;
+    text-align: center; text-transform: uppercase;
+    background: rgba(0,0,0,.72); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,.15);
+    opacity: 0; transform: scale(.96); transition: opacity .6s var(--ease), transform .6s var(--ease);
+  }
+  .egg.open .egg-panel { opacity: 1; transform: none; }
+  .egg-head { margin: 0; font: 400 11px/1.6 ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace; letter-spacing: .3em; color: var(--muted); }
+  .egg-quote { margin: 30px 0 0; font: 400 15px/1.9 var(--sans); letter-spacing: .22em; color: #ececec; }
+  .egg-season { margin: 30px 0 0; font: 400 10px/1.6 var(--sans); letter-spacing: .32em; color: var(--muted); }
+  .egg-bar { position: absolute; left: 0; bottom: 0; width: 100%; height: 1px; background: rgba(255,255,255,.4);
+    transform: scaleX(1); transform-origin: left; }
+  .egg.open .egg-bar { transform: scaleX(0); transition: transform 4.5s linear; }
+
   @media (max-width: 480px) {
     .sound { right: 16px; top: calc(22px + env(safe-area-inset-top)); }
+    .egg-panel { padding: 36px 22px 32px; }
+    .egg-quote { font-size: 13px; letter-spacing: .16em; }
+    .egg-head { letter-spacing: .2em; }
     .enter { padding: 0 40px 0 calc(40px + .35em); font-size: 12px; }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -169,6 +193,7 @@
     .layer { animation: none !important; }
     .reveal, .ready .reveal { transition: none; transform: none; filter: none; }
     .loader { transition-duration: .01s; }
+    .egg, .egg-panel, .egg-bar { transition: none !important; }
   }
 </style>
 </head>
@@ -194,6 +219,16 @@
 
 <!-- CANCIÓN: el archivo theme.mp3 va junto a este index.html, en la misma carpeta -->
 <audio id="audio" loop preload="auto" src="theme.mp3"></audio>
+
+<!-- Easter egg: se abre con 3 clics seguidos sobre el logo -->
+<div class="egg" id="egg" hidden>
+  <div class="egg-panel" role="dialog" aria-modal="true" aria-label="Archive 01">
+    <p class="egg-head">[ ARCHIVE 01 // ACCESS GRANTED ]</p>
+    <p class="egg-quote">“After the darkness the sacred pact shall rise again.”</p>
+    <p class="egg-season">Season 01 — The Pact P.1 // Genesis</p>
+    <div class="egg-bar" aria-hidden="true"></div>
+  </div>
+</div>
 
 <main class="page">
   <div class="stack">
@@ -336,6 +371,37 @@
       }
     }
   });
+
+  /* ============ Easter egg: 3 clics en 1.5 s sobre el logo ============ */
+  (function () {
+    var CLICKS = 3, WINDOW_MS = 1500, SHOW_MS = 4500;
+    var egg = document.getElementById('egg');
+    var logo = document.querySelector('.hero .scene');
+    var stamps = [], hideTimer = 0, removeTimer = 0;
+
+    function open() {
+      if (!egg.hidden && egg.classList.contains('open')) return;
+      clearTimeout(removeTimer);
+      egg.hidden = false;
+      void egg.offsetWidth;                       // reinicia las transiciones
+      egg.classList.add('open');
+      hideTimer = setTimeout(close, SHOW_MS);
+    }
+    function close() {
+      clearTimeout(hideTimer);
+      egg.classList.remove('open');
+      removeTimer = setTimeout(function () { egg.hidden = true; }, 700);
+    }
+
+    logo.addEventListener('click', function () {
+      var now = Date.now();
+      stamps.push(now);
+      stamps = stamps.filter(function (t) { return now - t <= WINDOW_MS; });
+      if (stamps.length >= CLICKS) { stamps = []; open(); }
+    });
+    egg.addEventListener('click', function (e) { if (e.target === egg) close(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && egg.classList.contains('open')) close(); });
+  })();
 
   /* ============ Cursor personalizado (solo con mouse) ============ */
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
