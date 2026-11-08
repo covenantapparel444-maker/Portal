@@ -59,24 +59,8 @@
   @keyframes sweep { to { background-position: 100% 100%; } }
   /* LOGO_STYLE = 'original': usa tu imagen tal cual, sin el efecto cromado */
   body.logo-original .layer { background: var(--logo) center / contain no-repeat; -webkit-mask: none; mask: none; animation: none; }
-  .halo {
-    position: absolute; left: 50%; top: 50%;
-    width: calc(var(--s) * 2.2); height: calc(var(--s) * 2.2);
-    transform: translate(-50%, -50%);
-    background: radial-gradient(circle, rgba(255,255,255,.17) 0%, rgba(255,255,255,.05) 35%, transparent 62%);
-    animation: pulse 6s ease-in-out infinite;
-    pointer-events: none;
-  }
-  @keyframes pulse { 50% { opacity: .55; transform: translate(-50%, -50%) scale(.92); } }
-  .floor {
-    position: absolute; left: 50%; bottom: calc(var(--s) * -.16);
-    width: calc(var(--s) * .9); height: calc(var(--s) * .12);
-    transform: translateX(-50%);
-    background: radial-gradient(ellipse, rgba(255,255,255,.14), transparent 70%);
-    filter: blur(6px);
-  }
 
-  /* ================= Fondo liso ================= */
+    /* ================= Fondo liso ================= */
   .bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: #000; }
 
   /* ================= Cursor personalizado ================= */
@@ -156,7 +140,8 @@
     color: var(--muted); transition: color .3s, transform .5s var(--ease); }
   .socials a:hover, .socials a:focus-visible { color: #fff; transform: translateY(-3px); outline: none; }
   .socials a:focus-visible { box-shadow: 0 0 0 1px var(--line); }
-  .socials svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; }
+  .socials i { display: block; width: 22px; height: 22px; background: currentColor;
+    -webkit-mask: var(--src) center / contain no-repeat; mask: var(--src) center / contain no-repeat; }
 
   .rule { margin: 36px auto 0; width: 40px; height: 1px; background: var(--line); }
   .legal { margin: 24px 0 0; color: var(--dim); font-size: 9px; font-weight: 400; letter-spacing: .24em; text-align: center; }
@@ -181,7 +166,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .rig { animation: none; transform: rotateY(-22deg); }
-    .halo, .face { animation: none !important; }
+    .layer { animation: none !important; }
     .reveal, .ready .reveal { transition: none; transform: none; filter: none; }
     .loader { transition-duration: .01s; }
   }
@@ -192,8 +177,8 @@
 
 <!-- Pantalla de carga: solo el logo -->
 <div class="loader" id="loader" role="status" aria-label="Loading">
-  <div class="scene" data-logo><div class="halo"></div></div>
-  <button class="enter" id="enter" type="button" aria-label="Enter site">ENTER</button>
+  <div class="scene" data-logo></div>
+  <button class="enter" id="enter" type="button" aria-label="Ingresar al sitio">INGRESAR</button>
 </div>
 
 <div class="bg" aria-hidden="true"></div>
@@ -214,25 +199,25 @@
   <div class="stack">
 
     <div class="hero reveal" style="--i:0; display:flex; justify-content:center">
-      <div class="scene" data-logo><div class="halo"></div><div class="floor"></div></div>
+      <div class="scene" data-logo></div>
     </div>
 
 <div class="season reveal" style="--i:1"><span>BIENVENIDO AL PORTAL</span></div>
 
     <!-- LINKS: cambia cada href por tu URL real. Se abren en pestaña nueva para que la música no se corte. -->
     <nav class="links" aria-label="Links">
-      <div class="reveal" style="--i:4"><a class="btn" href="https://TU-TIENDA.com" target="_blank" rel="noopener">ENTER THE SHOP</a></div>
-      <div class="reveal" style="--i:4"><a class="btn" href="https://TU-LINK-JOIN.com" target="_blank" rel="noopener">JOIN THE PACT</a></div>
-      <div class="reveal" style="--i:4"><a class="btn" href="https://TU-LINK-GALERIA.com" target="_blank" rel="noopener">THE GALLERY</a></div>
-      <div class="reveal" style="--i:4"><a class="btn" href="https://TU-LINK-PLAYLIST.com" target="_blank" rel="noopener">CVNT PLAYLIST</a></div>
+      <div class="reveal" style="--i:4"><a class="btn" href="https://TU-TIENDA.com" target="_blank" rel="noopener">STORE</a></div>
+      <div class="reveal" style="--i:4"><a class="btn" href="https://TU-LINK-EXCLUSIVE.com" target="_blank" rel="noopener">EXCLUSIVE</a></div>
+      <div class="reveal" style="--i:4"><a class="btn" href="https://TU-LINK-GALERIA.com" target="_blank" rel="noopener">GALLERY</a></div>
+      <div class="reveal" style="--i:4"><a class="btn" href="https://TU-LINK-PLAYLIST.com" target="_blank" rel="noopener">PLAYLIST</a></div>
       <div class="reveal" style="--i:4"><a class="btn" href="mailto:contacto@TU-DOMINIO.com">CONTACTO</a></div>
     </nav>
 
     <ul class="socials reveal" style="--i:5">
-      <li><a href="https://instagram.com/TU-USUARIO" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r=".6" fill="currentColor"/></svg></a></li>
-      <li><a href="https://tiktok.com/@TU-USUARIO" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.4 2.6 2 4.2 5 4.5"/></svg></a></li>
-      <li><a href="https://youtube.com/@TU-USUARIO" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="M10 9.2v5.6l4.8-2.8z"/></svg></a></li>
-      <li><a href="https://kick.com/TU-USUARIO" target="_blank" rel="noopener" aria-label="Kick"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4v16M5 12l7-8M8 11l8 9M12 12h7"/></svg></a></li>
+      <li><a href="https://instagram.com/TU-USUARIO" target="_blank" rel="noopener" aria-label="Instagram"><i style="--src: url('instagram.svg')"></i></a></li>
+      <li><a href="https://tiktok.com/@TU-USUARIO" target="_blank" rel="noopener" aria-label="TikTok"><i style="--src: url('tiktok.svg')"></i></a></li>
+      <li><a href="https://youtube.com/@TU-USUARIO" target="_blank" rel="noopener" aria-label="YouTube"><i style="--src: url('youtube.svg')"></i></a></li>
+      <li><a href="https://kick.com/TU-USUARIO" target="_blank" rel="noopener" aria-label="Kick"><i style="--src: url('kick.svg')"></i></a></li>
     </ul>
 
     <div class="rule reveal" style="--i:6"></div>
