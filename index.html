@@ -85,17 +85,6 @@
     100% { opacity: 1; transform: none; }
   }
   .loader.out { opacity: 0; transform: scale(1.06); pointer-events: none; }
-  .enter {
-    margin-top: clamp(40px, 8vh, 64px);
-    min-height: 52px; padding: 0 56px 0 calc(56px + .35em);
-    border-radius: 14px; border: 1px solid #f2f2f2; background: #f2f2f2; color: #000; cursor: pointer;
-    font: 700 13px/1 var(--sans); letter-spacing: .35em;
-    opacity: 0; transform: translateY(8px); pointer-events: none;
-    transition: opacity .6s, transform .6s var(--ease), background .4s, color .4s, letter-spacing .5s var(--ease);
-  }
-  .enter.show { opacity: 1; transform: none; pointer-events: auto; }
-  .enter:hover, .enter:focus-visible { background: transparent; color: #fff; letter-spacing: .45em; outline: none; }
-
   /* ================= Página ================= */
   .page {
     position: relative; z-index: 3; min-height: inherit;
@@ -183,18 +172,16 @@
 
   /* ================= Táctil / celular ================= */
   html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; }
-  .enter, .btn, .socials a, .sound { touch-action: manipulation; }
+  .btn, .socials a, .sound { touch-action: manipulation; }
   .rig { will-change: transform; }
 
   /* En pantallas táctiles no existe el hover real: se evita que quede "pegado" tras tocar */
   @media (hover: none) {
-    .enter:hover, .enter:focus-visible { background: #f2f2f2; color: #000; letter-spacing: .35em; }
     .btn:hover, .btn:focus-visible { border-color: var(--line); letter-spacing: .38em; }
     .btn:hover::before, .btn:focus-visible::before { transform: scaleX(0); }
     .socials a:hover, .socials a:focus-visible { color: var(--muted); transform: none; }
     .sound:hover, .sound:focus-visible { color: var(--muted); }
     /* respuesta inmediata al toque */
-    .enter:active { background: #bdbdbd; transform: scale(.97); transition-duration: .1s; }
     .btn:active { border-color: var(--line-strong); }
     .btn:active::before { transform: scaleX(1); transition-duration: .2s; }
     .socials a:active, .sound:active { color: #fff; }
@@ -209,7 +196,6 @@
     .egg-panel { padding: 36px 22px 32px; }
     .egg-quote { font-size: 13px; letter-spacing: .16em; }
     .egg-head { letter-spacing: .2em; }
-    .enter { padding: 0 40px 0 calc(40px + .35em); font-size: 12px; }
   }
   @media (prefers-reduced-motion: reduce) {
     .rig { animation: none; transform: rotateY(-22deg); }
@@ -226,7 +212,6 @@
 <!-- Pantalla de carga: solo el logo -->
 <div class="loader" id="loader" role="status" aria-label="Loading">
   <div class="scene" data-logo></div>
-  <button class="enter" id="enter" type="button" aria-label="Ingresar al sitio">INGRESAR</button>
 </div>
 
 <div class="bg" aria-hidden="true"></div>
@@ -286,16 +271,13 @@
 <script>
 (function () {
   /* ============ CONFIGURACIÓN ============ */
-  var ENTER_GATE   = true;   // true: aparece "ENTER" al terminar de cargar (garantiza que la música suene).
-                             // false: entra solo e intenta reproducir; muchos navegadores lo bloquean.
-  var MIN_LOAD_MS  = 2000;   // tiempo mínimo antes de mostrar ENTER (la llegada del logo dura ~2.4 s)
+  var MIN_LOAD_MS  = 3000;   // duración mínima de la pantalla de carga (la llegada del logo dura ~2.4 s)
   var LOGO_STYLE   = 'chrome'; // 'chrome': efecto cromado animado sobre tu logo. 'original': usa tu imagen tal cual.
   var VOLUME       = 0.7;    // volumen final de la canción (0 a 1)
   var FADE_MS      = 2500;   // fade-in de la música
 
   var body   = document.body;
   var loader = document.getElementById('loader');
-  var enter  = document.getElementById('enter');
   var btn    = document.getElementById('sound');
   var audio  = document.getElementById('audio');
   document.body.classList.add('logo-' + LOGO_STYLE);
@@ -373,26 +355,18 @@
   }
 
   Promise.all([domReady, fontsReady, minTime]).then(function () {
-    if (ENTER_GATE) {
-      enter.classList.add('show');
-      if (window.matchMedia('(pointer: fine)').matches) enter.focus({ preventScroll: true });
-      enter.addEventListener('click', function () {
-        if (wantsSound) play(); else render(false);
-        reveal();
-      }, { once: true });
-    } else {
-      reveal();
-      if (wantsSound) {
-        play().then(function (ok) {
-          if (ok) return;
-          var kick = function () {
-            if (wantsSound && !playing) play();
-            ['pointerdown', 'keydown', 'touchend'].forEach(function (ev) { window.removeEventListener(ev, kick); });
-          };
-          ['pointerdown', 'keydown', 'touchend'].forEach(function (ev) { window.addEventListener(ev, kick, { passive: true }); });
-        });
-      }
-    }
+    reveal();
+    if (!wantsSound) return;
+    // Los navegadores suelen bloquear el audio automático: si falla, suena en el primer toque o clic
+    play().then(function (ok) {
+      if (ok) return;
+      var evs = ['pointerdown', 'keydown', 'touchend'];
+      var kick = function () {
+        evs.forEach(function (ev) { window.removeEventListener(ev, kick); });
+        if (wantsSound && !playing) play();
+      };
+      evs.forEach(function (ev) { window.addEventListener(ev, kick, { passive: true }); });
+    });
   });
 
   /* ============ Easter egg: 3 clics en 1.5 s sobre el logo ============ */
