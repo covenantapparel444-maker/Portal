@@ -181,6 +181,29 @@
     transform: scaleX(1); transform-origin: left; }
   .egg.open .egg-bar { transform: scaleX(0); transition: transform 4.5s linear; }
 
+  /* ================= Táctil / celular ================= */
+  html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; }
+  .enter, .btn, .socials a, .sound { touch-action: manipulation; }
+  .rig { will-change: transform; }
+
+  /* En pantallas táctiles no existe el hover real: se evita que quede "pegado" tras tocar */
+  @media (hover: none) {
+    .enter:hover, .enter:focus-visible { background: #f2f2f2; color: #000; letter-spacing: .35em; }
+    .btn:hover, .btn:focus-visible { border-color: var(--line); letter-spacing: .38em; }
+    .btn:hover::before, .btn:focus-visible::before { transform: scaleX(0); }
+    .socials a:hover, .socials a:focus-visible { color: var(--muted); transform: none; }
+    .sound:hover, .sound:focus-visible { color: var(--muted); }
+    /* respuesta inmediata al toque */
+    .enter:active { background: #bdbdbd; transform: scale(.97); transition-duration: .1s; }
+    .btn:active { border-color: var(--line-strong); }
+    .btn:active::before { transform: scaleX(1); transition-duration: .2s; }
+    .socials a:active, .sound:active { color: #fff; }
+  }
+  /* Menos trabajo para la GPU en celulares: el brillo cromado queda fijo, el giro se mantiene */
+  @media (hover: none), (max-width: 600px) {
+    .layer { animation: none; background-position: 35% 35%; }
+  }
+
   @media (max-width: 480px) {
     .sound { right: 16px; top: calc(22px + env(safe-area-inset-top)); }
     .egg-panel { padding: 36px 22px 32px; }
@@ -218,7 +241,7 @@
 </button>
 
 <!-- CANCIÓN: el archivo theme.mp3 va junto a este index.html, en la misma carpeta -->
-<audio id="audio" loop preload="auto" src="theme.mp3"></audio>
+<audio id="audio" loop preload="metadata" src="theme.mp3"></audio>
 
 <!-- Easter egg: se abre con 3 clics seguidos sobre el logo -->
 <div class="egg" id="egg" hidden>
@@ -352,7 +375,7 @@
   Promise.all([domReady, fontsReady, minTime]).then(function () {
     if (ENTER_GATE) {
       enter.classList.add('show');
-      enter.focus({ preventScroll: true });
+      if (window.matchMedia('(pointer: fine)').matches) enter.focus({ preventScroll: true });
       enter.addEventListener('click', function () {
         if (wantsSound) play(); else render(false);
         reveal();
