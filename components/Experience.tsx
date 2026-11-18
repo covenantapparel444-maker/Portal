@@ -16,15 +16,18 @@ export default function Experience({ fase }: { fase: Fase }) {
   // Enlaces directos: /#genesis o /#registro abren la pieza sin pasar por la llamada.
   useEffect(() => {
     const h = window.location.hash;
-    if (h === "#genesis" || h === "#registro") setEscena("pieza");
-  }, []);
+    if (h === "#genesis" || h === "#registro") {
+      setEscena("pieza");
+      sonido.escena("pieza");
+    }
+  }, [sonido]);
 
   const ir = useCallback(
     (e: Escena, ancla?: string) => {
       setEscena(e);
       sonido.escena(e);
       if (e === "pieza" && ancla) {
-        requestAnimationFrame(() => setTimeout(() => document.getElementById(ancla)?.scrollIntoView({ behavior: "smooth" }), 350));
+        setTimeout(() => document.getElementById(ancla)?.scrollIntoView({ behavior: "smooth" }), 400);
       } else {
         window.scrollTo({ top: 0 });
       }
@@ -35,9 +38,9 @@ export default function Experience({ fase }: { fase: Fase }) {
   return (
     <main>
       <div className="grain" aria-hidden="true" />
-      {escena === "llamada" && <Llamada fase={fase} sonido={sonido} ir={ir} />}
+      {escena === "llamada" && <Llamada sonido={sonido} ir={ir} />}
       {escena === "cuarto" && <Cuarto sonido={sonido} ir={ir} />}
-      {escena === "pieza" && <Pieza fase={fase} ir={ir} />}
+      {escena === "pieza" && <Pieza fase={fase} sonido={sonido} ir={ir} />}
     </main>
   );
 }

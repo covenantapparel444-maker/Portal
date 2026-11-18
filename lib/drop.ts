@@ -43,7 +43,20 @@ export const DROP = {
   // Foto real de la mesa del cuarto (desde arriba, con velas). Ej: "/genesis/mesa.webp"
   fotoMesa: null as string | null,
 
-  // Videos de las pruebas. La sección solo aparece cuando al menos uno tiene video.
+  // Fotos. Mientras src sea null se muestra un espacio reservado con la descripción.
+  // Cuando tengas la foto, ponla en public/genesis/ y escribe aquí su ruta.
+  lookbook: [
+    { src: null as string | null, alt: "Mateo con GENESIS, cuerpo entero", etiqueta: "Mateo, 1,78 m, talla [TALLA]" },
+    { src: null as string | null, alt: "GENESIS Crop Top puesto", etiqueta: "Crop top, talla [TALLA]" },
+    { src: null as string | null, alt: "Espalda de GENESIS puesta, de cerca", etiqueta: "La espalda" },
+  ],
+  detallesFotos: [
+    { src: null as string | null, alt: "Cuello de rib grueso de cerca", etiqueta: "El cuello" },
+    { src: null as string | null, alt: "Etiqueta interior con el número de la pieza", etiqueta: "Tu número" },
+    { src: null as string | null, alt: "Emblema estampado en la nuca", etiqueta: "La nuca" },
+  ],
+
+  // Videos de las pruebas. Mientras video sea null se muestra un espacio reservado.
   pruebas: [
     { titulo: "La gramera", texto: "El peso real, sin edición.", video: null as string | null },
     { titulo: "Diez lavadas", texto: "Misma talla, mismo negro.", video: null as string | null },

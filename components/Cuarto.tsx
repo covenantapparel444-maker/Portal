@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { DROP } from "@/lib/drop";
 import type { Escena } from "./Experience";
 import type { Sonido } from "./useSonido";
+import { BotonSonido } from "./Iconos";
 
 type Hoja = "manifiesto" | "caja" | null;
 
@@ -31,11 +32,9 @@ export default function Cuarto({ sonido, ir }: { sonido: Sonido; ir: (e: Escena,
     const ix = indice.current;
     if (!el || !ix || window.matchMedia("(hover: hover)").matches || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     ix.style.setProperty("--radio", "62vw");
-    let t0 = performance.now(), raf = 0, tocado = false;
-    const parar = () => { tocado = true; };
-    el.addEventListener("pointerdown", parar, { once: true });
+    const t0 = performance.now();
+    let raf = 0;
     const paso = (t: number) => {
-      if (tocado) return;
       const k = ((t - t0) / 7000) % 1;
       const x = `${30 + Math.sin(k * Math.PI * 2) * 22}%`, y = `${45 + Math.cos(k * Math.PI * 2) * 30}%`;
       ix.style.setProperty("--lx", x);
@@ -47,6 +46,7 @@ export default function Cuarto({ sonido, ir }: { sonido: Sonido; ir: (e: Escena,
   }, []);
 
   const mover = (e: React.PointerEvent) => {
+    if (e.pointerType !== "mouse") return; // en celular la luz se mueve sola
     const el = cuarto.current;
     const ix = indice.current;
     if (!el || !ix) return;
@@ -94,9 +94,7 @@ export default function Cuarto({ sonido, ir }: { sonido: Sonido; ir: (e: Escena,
 
       <div className="barra-top">
         <span className="meta">Capítulo 1: The Call</span>
-        <button type="button" className="enlace meta" onClick={sonido.alternar} aria-pressed={sonido.activo}>
-          {sonido.activo ? "Sonido activado" : "Activar sonido"}
-        </button>
+        <BotonSonido on={sonido.activo} onClick={sonido.alternar} />
       </div>
 
       <div className="cuarto__mesa">
@@ -107,7 +105,6 @@ export default function Cuarto({ sonido, ir }: { sonido: Sonido; ir: (e: Escena,
       </div>
 
       <div className="cuarto__pie">
-        <span className="meta">Mueve la luz sobre la mesa.</span>
         <button type="button" className="boton boton--claro" onClick={() => ir("pieza")}>Salir a la luz</button>
       </div>
 
