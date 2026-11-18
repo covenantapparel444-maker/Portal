@@ -2,9 +2,6 @@ import type { Metadata, Viewport } from "next";
 // Fuentes dentro del proyecto (no dependen de Google Fonts al compilar).
 import "@fontsource-variable/archivo/wdth.css";
 import "@fontsource-variable/archivo/wdth-italic.css";
-import "@fontsource-variable/inter";
-import "@fontsource/jetbrains-mono/400.css";
-import "@fontsource/jetbrains-mono/500.css";
 import "./globals.css";
 
 export const metadata: Metadata = {

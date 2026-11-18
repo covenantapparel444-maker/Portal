@@ -3,82 +3,92 @@
 import { DROP, precioTexto, type Fase } from "@/lib/drop";
 import type { Escena } from "./Experience";
 import Emblema from "./Emblema";
-import Scramble from "./Scramble";
 import TeeViewer from "./TeeViewer";
 import Registro from "./Registro";
 
-const SPECS = [`${DROP.gramaje} g/m²`, "Preencogida", "Cuello doble costura", "Serigrafía", "Mensaje oculto", "001 — 050", "No se reedita"];
+const DETALLES = [
+  { t: `Algodón peinado de ${DROP.gramaje} g/m²`, d: "Preencogido: no cambia de talla al lavarla. Cae pesado y no se pega al cuerpo." },
+  { t: "Cuello de rib grueso", d: "Doble costura. Es lo primero que se deforma en una camiseta barata; este vuelve a su forma." },
+  { t: "Serigrafía", d: "Tinta blanca de alta opacidad que se siente parte de la tela y aguanta las lavadas." },
+  { t: "Numerada del 001 al 050", d: "Tu número va en la etiqueta interior. Nadie más lo tiene y no se reedita." },
+  { t: "Un mensaje adentro", d: "Solo lo encuentra quien la tiene puesta." },
+  { t: "Corte boxy", d: "Hombro caído y largo corto, probado en distintos cuerpos. También en crop top." },
+];
 
 export default function Pieza({ fase, ir }: { fase: Fase; ir: (e: Escena, ancla?: string) => void }) {
   const wa = DROP.whatsapp ? `https://wa.me/${DROP.whatsapp}` : undefined;
-  const libres = DROP.piezas - DROP.foundersReservadas;
-  const cta = fase === "lista" ? "[ Lista ]" : fase === "preventa" ? "[ Firmar ]" : "[ Sealed ]";
+  const pruebas = DROP.pruebas.filter((p) => p.video);
+  const cta = fase === "lista" ? "Entrar a la lista" : fase === "preventa" ? "Firmar" : "Sealed";
+  const estado = fase === "lista" ? `Preventa desde el ${DROP.abre}` : fase === "preventa" ? `Preventa hasta el ${DROP.cierra}` : "Las 50 piezas tienen dueño";
 
   return (
     <div className="scene">
-      <section className="hero" aria-label="GENESIS">
-        <div className="hero__esquinas">
-          <button type="button" onClick={() => ir("cuarto")}>{DROP.parte}<br />Limited release</button>
-          <span style={{ textAlign: "right" }}>{DROP.abre} — {DROP.cierra}<br />{DROP.anio}</span>
+      <section className="pieza-hero" aria-label="GENESIS">
+        <div className="barra-top meta" style={{ color: "#6a6a66" }}>
+          <button type="button" className="enlace" onClick={() => ir("cuarto")}>Volver al cuarto</button>
+          <span>{DROP.parte}</span>
         </div>
-        <div className="hero__titulo">
-          <Emblema size={46} />
-          <h1 className="disp"><Scramble text={DROP.nombre} /></h1>
+        <div className="pieza-hero__titulo">
+          <Emblema size={38} />
+          <h1 className="display"><span className="revela">{DROP.nombre}</span></h1>
           <p>After the darkness, the sacred pact shall rise again.</p>
         </div>
         <TeeViewer />
-        <div className="hero__pie">
-          <span>{String(DROP.piezas).padStart(3, "0")}<br />Piezas</span>
-          <span>Numerada. No se reedita.<br />{precioTexto()}</span>
-          <a href="#registro">Firmar<br />el pacto</a>
+        <div className="pieza-hero__pie meta" style={{ color: "#6a6a66" }}>
+          <span>{DROP.piezas} piezas numeradas</span>
+          <span>{estado}</span>
         </div>
       </section>
 
-      <div className="cinta" aria-label="Especificaciones">
-        <div className="cinta__track mono">
-          {[...SPECS, ...SPECS].map((s, i) => (
-            <span key={i} aria-hidden={i >= SPECS.length}>[ {s} ]</span>
+      <section className="bloque dos-col" aria-labelledby="detalles">
+        <h2 id="detalles" className="display dos-col__titulo">
+          Por qué esta y no otra
+          <small>Una camiseta que vale lo que cuesta se nota en la mano. Esto es lo que vas a sentir.</small>
+        </h2>
+        <ul className="filas">
+          {DETALLES.map((d) => (
+            <li key={d.t}><strong>{d.t}</strong><span>{d.d}</span></li>
           ))}
-        </div>
-      </div>
-
-      <section className="seccion" aria-label="Las pruebas">
-        <div className="seccion__cabeza">
-          <h2 className="disp">No te lo decimos.<br />Te lo mostramos.</h2>
-          <span className="mono muted">Behind the Pact 01 — 03</span>
-        </div>
-        <div className="pruebas">
-          <div className="prueba"><span className="prueba__video">[ Video ]</span><span className="mono muted">01 // La gramera</span><strong>El peso real, sin edición.</strong></div>
-          <div className="prueba"><span className="prueba__video">[ Video ]</span><span className="mono muted">02 // 10 lavadas</span><strong>Misma talla. Mismo negro.</strong></div>
-          <div className="prueba"><span className="prueba__video">[ Video ]</span><span className="mono muted">03 // El cuello</span><strong>Se estira y vuelve.</strong></div>
-        </div>
+        </ul>
       </section>
+
+      {pruebas.length > 0 && (
+        <section className="bloque" aria-label="Las pruebas" style={{ paddingTop: 0 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 20 }}>
+            {pruebas.map((p) => (
+              <figure key={p.titulo} style={{ margin: 0 }}>
+                <video src={p.video!} muted loop playsInline autoPlay style={{ width: "100%", aspectRatio: "4 / 5", objectFit: "cover", background: "#0a0a0a" }} />
+                <figcaption style={{ marginTop: 14 }}><strong style={{ fontWeight: 500 }}>{p.titulo}</strong><br /><span className="meta">{p.texto}</span></figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
 
       <Registro fase={fase} />
 
-      <section style={{ background: "var(--negro)" }}>
-        <div className="seccion" style={{ paddingTop: 72, paddingBottom: 72 }}>
-          <div className="garantias">
-            <div><span className="mono muted" style={{ fontSize: 11 }}>[ Si no se produce ]</span><span>Menos de {DROP.minimoParaProducir} piezas: te devolvemos el 100%.</span></div>
-            <div><span className="mono muted" style={{ fontSize: 11 }}>[ Entrega ]</span><span>Antes del {DROP.entrega}, desde Cajicá.</span></div>
-            <div><span className="mono muted" style={{ fontSize: 11 }}>[ Talla ]</span><span>Cambio garantizado en 5 días.</span></div>
-            <div><span className="mono muted" style={{ fontSize: 11 }}>[ Quién responde ]</span><span>Mateo y Johan, por {wa ? <a href={wa} target="_blank" rel="noopener">WhatsApp</a> : "WhatsApp"}.</span></div>
-          </div>
-        </div>
-        <div className="pie mono">
-          <span className="disp" style={{ color: "var(--blanco)", letterSpacing: "0.1em" }}>WE ARE THE PROMISE</span>
-          <span>Empezó en un examen de inglés — La Sabana</span>
-          <a href="/portal" style={{ textDecoration: "none" }}>[ Portal ]</a>
+      <section className="bloque" aria-label="Garantías" style={{ paddingTop: "clamp(80px, 10vw, 128px)", paddingBottom: "clamp(80px, 10vw, 128px)" }}>
+        <div className="garantias">
+          <div><h3>Si no llegamos a {DROP.minimoParaProducir} piezas</h3><p>Te devolvemos el 100% de lo que pagaste.</p></div>
+          <div><h3>Entrega</h3><p>Antes del {DROP.entrega}, despachada desde Cajicá.</p></div>
+          <div><h3>Talla</h3><p>Si no te queda, la cambiamos dentro de los 5 días después de recibirla.</p></div>
+          <div><h3>Quién responde</h3><p>Mateo y Johan, por {wa ? <a href={wa} target="_blank" rel="noopener">WhatsApp</a> : "WhatsApp"}.</p></div>
         </div>
       </section>
+
+      <footer className="pie meta">
+        <span className="marca" style={{ color: "var(--piedra)" }}>WE ARE THE PROMISE</span>
+        <span>Empezó en un examen de inglés en La Sabana.</span>
+        <a href="/portal" style={{ textDecoration: "none" }}>Portal</a>
+      </footer>
 
       <div className="barra">
         <div className="barra__inner">
           <div className="barra__info">
-            <span>{DROP.nombre} · {precioTexto()}</span>
-            <span className="muted">{fase === "sellado" ? "Sealed // 0 de 50" : fase === "lista" ? `Abre el ${DROP.abre} // ${libres} líneas` : `Preventa hasta el ${DROP.cierra}`}</span>
+            <strong>{DROP.nombre} <span className="num" style={{ fontWeight: 400, color: "var(--gris)" }}>{precioTexto()}</span></strong>
+            <span className="meta">{estado}</span>
           </div>
-          <a className="btn btn--claro" href="#registro" style={{ minHeight: 46 }}>{cta}</a>
+          <a className="boton boton--claro" href="#registro">{cta}</a>
         </div>
       </div>
     </div>

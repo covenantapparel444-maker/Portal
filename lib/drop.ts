@@ -39,6 +39,16 @@ export const DROP = {
     XL: { pecho: null, largo: null },
   } as Record<string, { pecho: number | null; largo: number | null }>,
   tallaMateo: "[TALLA]",
+
+  // Foto real de la mesa del cuarto (desde arriba, con velas). Ej: "/genesis/mesa.webp"
+  fotoMesa: null as string | null,
+
+  // Videos de las pruebas. La sección solo aparece cuando al menos uno tiene video.
+  pruebas: [
+    { titulo: "La gramera", texto: "El peso real, sin edición.", video: null as string | null },
+    { titulo: "Diez lavadas", texto: "Misma talla, mismo negro.", video: null as string | null },
+    { titulo: "El cuello", texto: "Se estira y vuelve a su forma.", video: null as string | null },
+  ],
   gramaje: "[GRAMAJE]",
 };
 
